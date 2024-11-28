@@ -1,8 +1,8 @@
 import mesa
 from mesa import Model
 from mesa.agent import AgentSet
-from agents.agents import CarAgent, TrafficLightAgent
 from mesa.space import MultiGrid
+from agents.agents import CarAgent, TrafficLightAgent
 import numpy as np
 
 class CityModel(Model):
@@ -338,7 +338,8 @@ class CityModel(Model):
             # Add more traffic lights as needed
         ]
         for pos in traffic_light_positions:
-            traffic_light = TrafficLightAgent(self, pos)
+            traffic_light = TrafficLightAgent(self)
+            self.grid.place_agent(traffic_light, pos)
             self.traffic_light_agents.add(traffic_light)
 
 
@@ -380,7 +381,7 @@ class CityModel(Model):
 
     def step(self):
         """Advance the model by one step."""
-        print(f"Model stepping. Current step: {self.steps}")
+        # print(f"Model stepping. Current step: {self.steps}")
         # Activate traffic lights
         self.traffic_light_agents.do("step")
         # Activate cars

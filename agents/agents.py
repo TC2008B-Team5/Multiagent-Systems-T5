@@ -9,7 +9,7 @@ class CarAgent(Agent):
         self.destination_pos = None
         self.active = True  # Indicates if the car is still moving
         self.path = []
-        print(f"Car {self.unique_id} created at position {self.pos}")
+        # print(f"Car {self.unique_id} created at position {self.pos}")
 
 
     def calculate_path(self):
@@ -25,9 +25,9 @@ class CarAgent(Agent):
 
         while open_set:
             current = min(open_set, key=lambda pos: f_score.get(pos, float('inf')))
-            print(f"Current position: {current}")
+            # print(f"Current position: {current}")
             if current == goal:
-                print(f"Goal reached: {goal}")
+                # print(f"Goal reached: {goal}")
                 return self.reconstruct_path(came_from, current)
 
             open_set.remove(current)
@@ -65,29 +65,30 @@ class CarAgent(Agent):
     def is_valid_move(self, from_pos, to_pos):
         """Check whether moving from from_pos to to_pos is a valid move."""
         if self.model.grid.out_of_bounds(to_pos):
-            print(f"Move from {from_pos} to {to_pos} is out of bounds.")
+            # print(f"Move from {from_pos} to {to_pos} is out of bounds.")
             return False
 
         # Get the list of agents at to_pos
         cell_contents = self.model.grid.get_cell_list_contents([to_pos])
 
         if any(isinstance(agent, CarAgent) for agent in cell_contents):
-            print(f"Move from {from_pos} to {to_pos} is blocked by another car.")
+            # print(f"Move from {from_pos} to {to_pos} is blocked by another car.")
             return False  # Cell is occupied by another car
 
         # Check for buildings
         if self.model.is_building(to_pos):
-            print(f"Move from {from_pos} to {to_pos} is blocked by a building.")
+            # print(f"Move from {from_pos} to {to_pos} is blocked by a building.")
             return False  # Can't move into a building
 
         # Check for traffic lights
         for agent in cell_contents:
             if isinstance(agent, TrafficLightAgent):
                 if agent.state == 'Red':
-                    print(f"Move from {from_pos} to {to_pos} is blocked by a red traffic light.")
+                    # print(f"Move from {from_pos} to {to_pos} is blocked by a red traffic light.")
                     return False  # Can't move on red light
                 else:
-                    print(f"Move from {from_pos} to {to_pos} is allowed by traffic light.")
+                    # print(f"Move from {from_pos} to {to_pos} is allowed by traffic light.")
+                    pass
 
         # Determine the actual movement direction
         dx = to_pos[0] - from_pos[0]
@@ -102,37 +103,39 @@ class CarAgent(Agent):
         elif dy == -1:
             movement_direction = 'S'
         else:
-            print(f"Invalid movement from {from_pos} to {to_pos}.")
+            # print(f"Invalid movement from {from_pos} to {to_pos}.")
             return False  # Movement is not to an adjacent cell
 
         # Check if the movement direction is allowed
         if movement_direction in self.model.road_direction_layer[from_pos[0], from_pos[1]]:
-            print(f"Move from {from_pos} to {to_pos} in direction '{movement_direction}' is valid.")
+            # print(f"Move from {from_pos} to {to_pos} in direction '{movement_direction}' is valid.")
             return True
         else:
-            print(f"Move from {from_pos} to {to_pos} in direction '{movement_direction}' is invalid.")
+            # print(f"Move from {from_pos} to {to_pos} in direction '{movement_direction}' is invalid.")
+            pass
         return False
 
     def step(self):
-        print(f"Car {self.unique_id} at position {self.pos} taking a step.")
+        # print(f"Car {self.unique_id} at position {self.pos} taking a step.")
         if not self.active:
-            print(f"Car {self.unique_id} is inactive.")
+            # print(f"Car {self.unique_id} is inactive.")
             return
 
         if not self.path:
             # Try to recalculate the path or move randomly
-            print(f"Car {self.unique_id} has no path. Recalculating...")
+            # print(f"Car {self.unique_id} has no path. Recalculating...")
             self.calculate_path()
             if not self.path:
-                print(f"Car {self.unique_id} still cannot find a path. Moving randomly.")
+                # print(f"Car {self.unique_id} still cannot find a path. Moving randomly.")
                 # Move randomly to a valid neighboring cell
                 valid_neighbors = self.get_valid_neighbors(self.pos)
                 if valid_neighbors:
                     next_pos = self.random.choice(valid_neighbors)
                     self.model.grid.move_agent(self, next_pos)
-                    print(f"Car {self.unique_id} moved randomly to {next_pos}")
+                    # print(f"Car {self.unique_id} moved randomly to {next_pos}")
                 else:
-                    print(f"Car {self.unique_id} cannot move from position {self.pos}.")
+                    # print(f"Car {self.unique_id} cannot move from position {self.pos}.")
+                    pass
                 return
 
         # Move to the next position in the path
@@ -146,24 +149,26 @@ class CarAgent(Agent):
                     self.model.grid.move_agent(self, next_pos)
                     self.path.pop(0)
                     self.active = False
-                    print(f"Car {self.unique_id} has arrived at Parking Lot at position {self.destination_pos}")
+                    # print(f"Car {self.unique_id} has arrived at Parking Lot at position {self.destination_pos}")
                     self.remove()
                 else:
                     # Parking lot is occupied; wait or choose a new destination
-                    print(f"Parking Lot at {next_pos} is occupied. Assigning new destination.")
+                    # print(f"Parking Lot at {next_pos} is occupied. Assigning new destination.")
                     # self.model.assign_random_destination(self, exclude_pos=self.pos)
                     # self.calculate_path()
+                    pass
             else:
                 # Move to the next position if it's a valid move
                 if self.is_valid_move(self.pos, next_pos):
                     self.model.grid.move_agent(self, next_pos)
                     self.path.pop(0)
-                    print(f"Car {self.unique_id} moved to {next_pos}")
+                    # print(f"Car {self.unique_id} moved to {next_pos}")
                 else:
-                    print(f"Car {self.unique_id} cannot move to {next_pos}. Recalculating path.")
+                    # print(f"Car {self.unique_id} cannot move to {next_pos}. Recalculating path.")
                     self.calculate_path()
         else:
-            print(f"Car {self.unique_id} has no path to follow.")
+            # print(f"Car {self.unique_id} has no path to follow.")
+            pass
 
     def remove(self):
         """Remove the car agent from the model and grid."""
