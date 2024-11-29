@@ -383,14 +383,13 @@ class CityModel(Model):
         """Advance the model by one step."""
         # print(f"Model stepping. Current step: {self.steps}")
         # Activate traffic lights
-        self.traffic_light_agents.do("step")
-        # Activate cars
-        self.car_agents.do("step")
+        self.agents.do("step")
 
     def get_car_positions(self):
-        """Return a list of positions of all active car agents."""
+        """Return a list of positions of all active car agents, remembering that here we have x and y"""
         car_positions = []
         for car in self.car_agents:
             if car.active:
-                car_positions.append({'id': car.unique_id, 'position': car.pos})
+                #For post i need to multiply x by 10 + 5 and y is -(y *10 + 5 )
+                car_positions.append({'id': car.unique_id, 'position': (car.pos[0] * 10 + 5, -(car.pos[1] * 10 + 5))})
         return car_positions
